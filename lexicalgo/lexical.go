@@ -1,10 +1,12 @@
+
 package main
 
 import (
 	"os"
-	"bufio"
 	"fmt"
 	"strings"
+	"io/ioutil"
+	// "strconv"
 )
 
 var content string
@@ -15,25 +17,26 @@ var keywords = map[string]int {
 	":=": 18, "<": 20,"<>": 21, "<=": 22, ">": 23, 
 	">=": 24, "=": 25, ";": 26, "(": 27,")": 28, "#": 0}
 var letter string = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-var digit string = "0123456789"
+// var digit string = "0123456789"
+
 
 func main() {
-	var reader *bufio.Reader
-	var err error
 	var syn int
 	var token string
-	reader = bufio.NewReader(os.Stdin)
-	fmt.Println("Please input:")
-	content, err = reader.ReadString('#')
+	b, err := ioutil.ReadFile("test.zhl")
 	if err != nil {
-		fmt.Println("input error")
+		fmt.Println(err)
 		os.Exit(0)
 	}
+	content = string(b)
+	content = strings.Replace(content, "\n", " ", -1)
+	// fmt.Println(content)
 	for p < len(content) {
 		token, syn = lexical()
 		fmt.Printf("(%d, %s)\n", syn, token)
 	}
 }
+
 
 func lexical() (string, int) {
 	c := content[p]
@@ -60,12 +63,15 @@ func lexical() (string, int) {
 
 	} else if c >= '0' && c <= '9' {
 		for c >= '0' && c <= '9' {
+			// if c == '0' {
+			// 	right++
+			// }
 			left = p + 1
 			p += 1
 			c = content[p]
 		}
 		if strings.ContainsAny(string(c), letter) {
-			for strings.ContainsAny(string(c), letter) {
+			for strings.ContainsAny(string(c), letter) || (c >= '0' && c <= '9') {
 				left = p + 1
 				p += 1
 				c = content[p]
@@ -73,6 +79,8 @@ func lexical() (string, int) {
 			token = content[right:left]
 			return token, -1
 		} else {
+			// token_num, _:= strconv.Atoi(content[right:left])
+			// token = strconv.Itoa(token_num)
 			token = content[right:left]
 			return token, 11
 		}
@@ -109,16 +117,16 @@ func lexical() (string, int) {
 			token = string(c)
 		}
 		c = content[p + 1]
-		if c != ' ' && !strings.ContainsAny(string(c), letter) && !(c >= '0' && c <= '9'){
-			for c != ' ' && !strings.ContainsAny(string(c), letter) && !(c >= '0' && c <= '9') {
-				left = p + 1
-				token = content[right:left]
-				p += 1
-				c = content[p]
-			}
-		} else {
-			p += 1
-		}
+		// if c != ' ' && !strings.ContainsAny(string(c), letter) && !(c >= '0' && c <= '9'){
+		// 	for c != ' ' && !strings.ContainsAny(string(c), letter) && !(c >= '0' && c <= '9') {
+		// 		left = p + 1
+		// 		token = content[right:left]
+		// 		p += 1
+		// 		c = content[p]
+		// 	}
+		// } else {
+		p += 1
+		// }
 		if _, ok := keywords[token]; ok {
 			syn = keywords[token]
 		} else {
