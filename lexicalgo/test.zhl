@@ -1,4 +1,4 @@
 begin
-    x := 99;
-    if x > 5 then x = 6;
+    9x := 0099;
+    if x >< 5 th99en x = 6;
 end#
