@@ -2,9 +2,5 @@
 compile
 =======
 
-lexical branch: compiler lexical part
-<<<<<<< HEAD
+lexical: lab1, compiler lexical part
 </pre>
-=======
-</pre>
->>>>>>> lexical
