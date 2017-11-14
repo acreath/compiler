@@ -33,6 +33,8 @@ func main() {
 	var content string
 	var ip int = 0
 	var x, a string
+	var faultIndex []int
+	var flag bool = true
 
 	b, err := ioutil.ReadFile("test.zhl")
 	if err != nil {
@@ -55,10 +57,12 @@ func main() {
 			ip++
 		} else if strings.ContainsAny(x, term_sym) {
 			fmt.Printf("终结符\n")
-			errorAction()
+			flag = errorAction()
 		} else if _, ok := checkTable(x, a); !ok {
 			fmt.Printf("报错条目 %v\n", ok)
-			errorAction()
+			faultIndex = append(faultIndex, ip)
+			ip++
+			flag = errorAction()
 		} else if s, ok := checkTable(x, a); ok {
 			fmt.Printf("output: %v -> %v\n", x, s)
 			stack = stack[:len(stack)-1]
@@ -75,6 +79,14 @@ func main() {
 		if count > 100 {
 			os.Exit(0)
 		}
+	}
+	for _, item := range faultIndex {
+		fmt.Printf("错误条目: %s\n", string(content[item-1: item+1]))
+	}
+	if flag {
+		fmt.Printf("合法输入\n")
+	} else {
+		fmt.Printf("非法输入\n")
 	}
 }
 
@@ -104,8 +116,9 @@ func checkTable(x string, a string) (string, bool) {
 	return "", false
 }
 
-func errorAction() {
+func errorAction() bool {
 	fmt.Printf("error\n")
+	return false
 }
 
 func myPush(s string) {
