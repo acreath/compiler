@@ -49,22 +49,27 @@ func main() {
 	x = "E"
 	var count int = 0;
 	for x != "$" {
-		fmt.Printf("stack: %v\ninput: %v\n", stack, content[ip:])
+		// fmt.Printf("stack: %v\ninput: %v\n", stack, content[ip:])
+		fmt.Printf("%-16v %-16v", strings.Join(stack[:], " "), content[ip:])
 		a = string(content[ip])
 		if x == a {
 			stack = stack[:len(stack)-1]
-			fmt.Printf("match: %v\n", x)
+			// fmt.Printf("match: %v\n", x)
+			out := "match " + x
+			fmt.Printf("%-16s", out)
 			ip++
 		} else if strings.ContainsAny(x, term_sym) {
-			fmt.Printf("终结符\n")
+			fmt.Printf("终结符")
 			flag = errorAction()
 		} else if _, ok := checkTable(x, a); !ok {
-			fmt.Printf("报错条目 %v\n", ok)
+			fmt.Printf("报错条目")
 			faultIndex = append(faultIndex, ip)
 			ip++
 			flag = errorAction()
 		} else if s, ok := checkTable(x, a); ok {
-			fmt.Printf("output: %v -> %v\n", x, s)
+			// fmt.Printf("output: %v -> %v\n", x, s)
+			out := x + "->" + s
+			fmt.Printf("%-16v", out)
 			stack = stack[:len(stack)-1]
 			if s != "#" {
 				// push
@@ -72,7 +77,7 @@ func main() {
 			}
 		}
 		x = string(stack[len(stack)-1])
-		fmt.Printf("x: %v\n==============\n", x)
+		fmt.Printf("%-16v\n", x)
 		
 		// 调试
 		count++
@@ -81,7 +86,7 @@ func main() {
 		}
 	}
 	for _, item := range faultIndex {
-		fmt.Printf("错误条目: %s\n", string(content[item-1: item+1]))
+		fmt.Printf("错误条目: %s\n", string(content[item:item+1]))
 	}
 	if flag {
 		fmt.Printf("合法输入\n")
@@ -117,7 +122,7 @@ func checkTable(x string, a string) (string, bool) {
 }
 
 func errorAction() bool {
-	fmt.Printf("error\n")
+	fmt.Printf("error ")
 	return false
 }
 
