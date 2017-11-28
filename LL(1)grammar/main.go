@@ -20,11 +20,11 @@ var AT_col [] string = [] string {"E", "E'", "T", "T'", "F"}
 var AT_row [] string = [] string {"i", "+", "*", "(", ")", "$"}
 // i + * ( ) $
 var AT_content [][]string = [][] string {
-	{"TE'", "", "", "TE'", "", ""},
+	{"TE'", "", "", "TE'", "synch", "synch"},
 	{"", "+TE'", "", "", "#", "#"},
-	{"FT'", "", "", "FT'", "", ""},
+	{"FT'", "synch", "", "FT'", "synch", "synch"},
 	{"", "#", "*FT'", "", "#", "#"},
-	{"i", "", "", "(E)", "", ""},
+	{"i", "synch", "", "(E)", "synch", "synch"},
 }
 var stack [] string
 
@@ -60,11 +60,20 @@ func main() {
 			ip++
 		} else if strings.ContainsAny(x, term_sym) {
 			fmt.Printf("终结符")
+			stack = stack[:len(stack) - 1]
 			flag = errorAction()
-		} else if _, ok := checkTable(x, a); !ok {
-			fmt.Printf("报错条目")
-			faultIndex = append(faultIndex, ip)
-			ip++
+		} else if s, ok := checkTable(x, a); !ok {
+			// fmt.Printf("报错条目")
+			if s == "" {
+				out := "ignore " + string(content[ip])
+				fmt.Printf("%c[1;40;32m%-16s%c[0m", 0x1B, out, 0x1B)
+				faultIndex = append(faultIndex, ip)
+				ip++
+			} else if s == "synch" {
+				out := "=synch"
+				fmt.Printf("%c[1;40;32m%-16s%c[0m", 0x1B, out, 0x1B)				
+				stack = stack[:len(stack) - 1]
+			}
 			flag = errorAction()
 		} else if s, ok := checkTable(x, a); ok {
 			// fmt.Printf("output: %v -> %v\n", x, s)
@@ -81,7 +90,7 @@ func main() {
 		
 		// 调试
 		count++
-		if count > 100 {
+		if count > 1000 {
 			os.Exit(0)
 		}
 	}
@@ -114,15 +123,15 @@ func checkTable(x string, a string) (string, bool) {
 	}
 	ret := AT_content[idx_col][idx_row]
 	// fmt.Printf("%d %d %v\n", idx_col, idx_row, ret)
-	if ret != "" {
+	if ret != "" && ret != "synch" {
 		return ret, true
 	}
 
-	return "", false
+	return ret, false
 }
 
 func errorAction() bool {
-	fmt.Printf("error ")
+	// fmt.Printf("error")
 	return false
 }
 
